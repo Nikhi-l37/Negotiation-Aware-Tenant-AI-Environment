@@ -9,13 +9,14 @@ Environment variables required:
     API_BASE_URL   — LLM endpoint (e.g. https://api.openai.com/v1)
     MODEL_NAME     — model identifier (e.g. gpt-4o)
     HF_TOKEN       — Hugging Face token (also used as OPENAI_API_KEY)
+    LOCAL_IMAGE_NAME — Docker image name for the environment
 """
 
 import asyncio
 import json
 import os
 import sys
-from typing import List
+from typing import List, Optional
 
 from openai import OpenAI
 
@@ -28,7 +29,7 @@ from models import TenantAction
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o")
 HF_TOKEN = os.getenv("HF_TOKEN")
-IMAGE_NAME = os.getenv("IMAGE_NAME", "tenant-negotiation-env")
+IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME", "tenant-negotiation-env")
 
 TASK_NAMES = ["easy", "medium", "hard"]
 MAX_STEPS = 12
@@ -66,41 +67,30 @@ Respond with ONLY a JSON object like:
 """
 
 
-# ── Structured logging (matches Meta OpenEnv validator format) ────────
+# ── Structured logging (matches Meta OpenEnv mandatory stdout format) ─
 
 def log_start(task: str, env: str, model: str) -> None:
-    """Emit the [START] log block."""
-    print(json.dumps({
-        "type": "[START]",
-        "task": task,
-        "env": env,
-        "model": model,
-    }), flush=True)
+    """Emit the [START] log line."""
+    print(f"[START] task={task} env={env} model={model}", flush=True)
 
 
-def log_step(step: int, action: str, reward: float, done: bool, error=None) -> None:
-    """Emit the [STEP] log block."""
-    entry = {
-        "type": "[STEP]",
-        "step": step,
-        "action": action,
-        "reward": reward,
-        "done": done,
-    }
-    if error:
-        entry["error"] = str(error)
-    print(json.dumps(entry), flush=True)
+def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str] = None) -> None:
+    """Emit the [STEP] log line."""
+    done_val = str(done).lower()
+    error_val = error if error else "null"
+    print(
+        f"[STEP] step={step} action={action} reward={reward:.2f} done={done_val} error={error_val}",
+        flush=True,
+    )
 
 
 def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> None:
-    """Emit the [END] log block."""
-    print(json.dumps({
-        "type": "[END]",
-        "success": success,
-        "steps": steps,
-        "score": score,
-        "rewards": rewards,
-    }), flush=True)
+    """Emit the [END] log line."""
+    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+    print(
+        f"[END] success={str(success).lower()} steps={steps} score={score:.2f} rewards={rewards_str}",
+        flush=True,
+    )
 
 
 # ── LLM helper ────────────────────────────────────────────────────────

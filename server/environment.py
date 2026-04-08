@@ -168,6 +168,37 @@ class TenantNegotiationEnvironment(Environment):
                 trust_delta -= 0.30
                 messages.append("WARNING: Maintenance ignored! Major trust drop.")
 
+        # ---- Dynamic Market Events (deterministic, by month) ----
+        # These events force the agent to adapt its strategy mid-episode.
+        # All events are deterministic (fixed to specific months) so grading
+        # remains fully reproducible.
+
+        if month == 3:
+            # PIPE BURST — emergency maintenance required
+            if not action.perform_maintenance:
+                trust_delta -= 0.40
+            messages.append(
+                "Emergency: A pipe burst! If you did not perform maintenance "
+                "this month, trust plummeted."
+            )
+
+        if month == 7:
+            # MARKET BOOM — property values spike
+            self._market_rate *= 1.20
+            messages.append(
+                "Market Shock: Property values spiked. The market rate has "
+                "suddenly increased by 20%."
+            )
+
+        if month == 10:
+            # JOB LOSS — tenant financial hardship
+            if action.increase_rent:
+                trust_delta = -self._trust_score  # Force trust to 0.0
+            messages.append(
+                "Tenant Hardship: The tenant lost their job. Any rent increase "
+                "this month will cause them to move out immediately."
+            )
+
         # ---- Update trust (clamped to [0, 1]) ----
         self._trust_score = max(0.0, min(1.0, self._trust_score + trust_delta))
 

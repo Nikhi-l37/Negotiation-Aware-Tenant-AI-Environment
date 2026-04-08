@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tenant-negotiation-env"
+version = "1.0.0"
+description = "Negotiation-Aware Tenant AI Environment"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "openenv-core",
+    "pydantic",
+    "openai",
+    "fastapi",
+    "uvicorn",
+    "websockets"
+]
+
+[project.scripts]
+server = "server.app:main"

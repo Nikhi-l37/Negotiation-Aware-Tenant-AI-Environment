@@ -1,0 +1,29 @@
+name: "tenant-negotiation-env"
+version: "1.0.0"
+description: >
+  Negotiation-Aware Tenant AI Environment. An agent manages a rental property,
+  negotiating rent and handling maintenance while balancing immediate profit
+  against long-term tenant trust and retention.
+
+entrypoint: "server.environment:TenantNegotiationEnvironment"
+
+client: "client:TenantEnv"
+
+tasks:
+  easy:
+    description: "Maximize profit with a loyal, forgiving tenant over 12 months."
+    grader: "tasks:grade_easy"
+    kwargs:
+      task_name: "easy"
+
+  medium:
+    description: "Handle a price-sensitive tenant who will leave if rent exceeds market tolerance."
+    grader: "tasks:grade_medium"
+    kwargs:
+      task_name: "medium"
+
+  hard:
+    description: "Manage a demanding tenant who requires maintenance every 3 months or trust collapses."
+    grader: "tasks:grade_hard"
+    kwargs:
+      task_name: "hard"

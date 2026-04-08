@@ -1,0 +1,6 @@
+openenv-core>=0.2.1
+pydantic>=2.0
+openai>=1.0
+fastapi>=0.100
+uvicorn[standard]>=0.20
+websockets>=11.0

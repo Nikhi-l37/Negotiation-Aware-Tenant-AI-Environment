@@ -150,7 +150,11 @@ async def run_task(task_name: str) -> float:
     base_url=API_BASE_URL,
     api_key=HF_TOKEN
     )
-    env = await TenantEnv.from_docker_image(IMAGE_NAME)
+    try:
+        env = await TenantEnv.from_docker_image(IMAGE_NAME)
+    except Exception as exc:
+        print(f"[DEBUG] from_docker_image failed: {exc}. Falling back to localhost:8000.", flush=True)
+        env = TenantEnv(base_url="http://localhost:8000")
     history: List[str] = []
     rewards: List[float] = []
     steps_taken = 0

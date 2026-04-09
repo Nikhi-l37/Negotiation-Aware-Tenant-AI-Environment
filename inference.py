@@ -214,6 +214,11 @@ async def run_task(task_name: str) -> float:
         score = min(max(score, 0.0), 1.0)
         success = score >= SUCCESS_SCORE_THRESHOLD
 
+    except Exception as e:
+        print(f"[DEBUG] Runtime or Network error: {e}", file=sys.stderr, flush=True)
+        score = 0.0
+        success = False
+
     finally:
         try:
             await env.close()

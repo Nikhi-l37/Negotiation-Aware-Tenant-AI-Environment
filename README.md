@@ -1,4 +1,3 @@
-Meta PyTorch OpenEnv Hackathon x Scaler School of Technology
 ---
 title: Tenant Negotiation Environment
 emoji: 🏠
